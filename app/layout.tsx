@@ -4,6 +4,8 @@ import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gaspardlevchin.github.io/fichr-site/";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const siteOrigin = new URL(siteUrl).origin;
+const socialImagePath = `${basePath}/og/fichr-social.jpg`;
 
 const montserrat = localFont({
   src: [
@@ -16,7 +18,7 @@ const montserrat = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteOrigin),
   title: {
     default: "Fichr — Vos données produit, prêtes à être vues",
     template: "%s — Fichr",
@@ -55,7 +57,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     images: [
       {
-        url: `${basePath}/og/fichr-social.jpg`,
+        url: socialImagePath,
         width: 1200,
         height: 630,
         alt: "Fichr — Vos données produit, prêtes à être vues.",
@@ -67,7 +69,7 @@ export const metadata: Metadata = {
     title: "Fichr — Vos données produit, prêtes à être vues.",
     description:
       "Structurez, validez et publiez vos informations produit depuis une source fiable.",
-    images: [`${basePath}/og/fichr-social.jpg`],
+    images: [socialImagePath],
   },
   robots: {
     index: true,

@@ -37,6 +37,8 @@ test("server-renders the Fichr marketing homepage", async () => {
   assert.match(html, /src="\/brand\/fichr_logo\.svg"/);
   assert.match(html, /id="fonctionnement"/);
   assert.match(html, /id="produit"/);
+  assert.match(html, /id="transformation"/);
+  assert.match(html, /id="impact"/);
   assert.match(html, /id="securite"/);
   assert.match(html, /id="tarifs"/);
   assert.match(html, /Interface et données présentées à titre illustratif\./);
@@ -45,13 +47,17 @@ test("server-renders the Fichr marketing homepage", async () => {
   assert.match(html, /59(?:<!-- -->)? €/);
   assert.match(html, /129(?:<!-- -->)? € \/ mois/);
   assert.match(html, /Validation humaine requise/);
+  assert.match(html, /Cinq sources entrent/);
+  assert.match(html, /Votre identité reste devant/);
+  assert.match(html, /Travail répétitif potentiellement libéré/);
   assert.ok(html.indexOf("<h3") > html.indexOf("<h2"), "the first H3 must follow the first H2");
   assert.doesNotMatch(html, /codex-preview|Starter Project|SkeletonPreview|react-loading-skeleton/i);
 });
 
 test("keeps the public site separate from the Fichr application", async () => {
-  const [page, layout, packageJson, logo, productTruth] = await Promise.all([
+  const [page, interactions, layout, packageJson, logo, productTruth] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/site-interactions.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../public/brand/fichr_logo.svg", import.meta.url), "utf8"),
@@ -61,6 +67,10 @@ test("keeps the public site separate from the Fichr application", async () => {
   assert.match(packageJson, /"name": "fichr-site"/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(layout, /lang="fr"/);
+  assert.doesNotMatch(page, /^"use client"/);
+  assert.match(interactions, /^"use client"/);
+  assert.match(interactions, /prefers-reduced-motion: reduce/);
+  assert.match(interactions, /Estimation indicative/);
   assert.match(page, /Aucun faux formulaire ne collecte vos coordonnées/);
   assert.doesNotMatch(page, /from\s+["'][^"']*(?:server|db)\/|drizzle|better-sqlite3|checkout/i);
   assert.match(productTruth, /direct_channel_connections|Connexions directes aux plateformes|Connexions directes standards/);

@@ -1,13 +1,18 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import {
   availabilityLabels,
   businessPrice,
   plans,
   type Availability,
 } from "../content/product-truth";
+import {
+  ArtDirectionDemo,
+  MotionController,
+  SavingsEstimator,
+  SiteHeader,
+  SuggestionDemo,
+  TransformationDemo,
+} from "../components/site-interactions";
 
 const sourceFormats = ["CSV", "XLSX", "JSON"];
 const outputFormats = ["TXT", "CSV", "XLSX", "JSON", "PDF"];
@@ -42,93 +47,30 @@ function AvailabilityBadge({ status }: { status: Availability }) {
 }
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/brand/fichr_logo.svg`;
-
-  useEffect(() => {
-    if (!menuOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setMenuOpen(false);
-      menuButtonRef.current?.focus();
-    };
-    const closeOutside = (event: PointerEvent) => {
-      if (headerRef.current?.contains(event.target as Node)) return;
-      setMenuOpen(false);
-    };
-
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", closeOnEscape);
-    document.addEventListener("pointerdown", closeOutside);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
-      document.removeEventListener("pointerdown", closeOutside);
-    };
-  }, [menuOpen]);
 
   return (
     <>
       <a className="skip-link" href="#content">Aller au contenu</a>
-
-      <header className="site-header" ref={headerRef}>
-        <a className="brand-link" href="#top" aria-label="Fichr — Accueil">
-          <Image src={logoSrc} alt="Fichr" width={130} height={50} priority />
-        </a>
-
-        <nav className="desktop-nav" aria-label="Navigation principale">
-          <a href="#fonctionnement">Démonstration</a>
-          <a href="#produit">Produit</a>
-          <a href="#securite">Sécurité</a>
-          <a href="#tarifs">Tarifs</a>
-        </nav>
-
-        <div className="header-actions">
-          <a className="text-action" href="#fonctionnement">Voir la démo</a>
-          <a className="button button--dark button--compact" href="#contact">Accès bêta</a>
-        </div>
-
-        <button
-          className="menu-toggle"
-          ref={menuButtonRef}
-          type="button"
-          aria-controls="mobile-nav"
-          aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          onClick={() => setMenuOpen((value) => !value)}
-        >
-          <span /><span />
-        </button>
-
-        <nav id="mobile-nav" className={menuOpen ? "mobile-nav mobile-nav--open" : "mobile-nav"} aria-label="Navigation mobile">
-          <a href="#fonctionnement" onClick={() => setMenuOpen(false)}>Démonstration</a>
-          <a href="#produit" onClick={() => setMenuOpen(false)}>Produit</a>
-          <a href="#securite" onClick={() => setMenuOpen(false)}>Sécurité</a>
-          <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
-          <a className="button button--dark" href="#contact" onClick={() => setMenuOpen(false)}>Accès bêta</a>
-        </nav>
-      </header>
+      <MotionController />
+      <SiteHeader logoSrc={logoSrc} />
 
       <main id="content">
         <section className="hero" id="top">
-          <div className="hero-copy">
+          <div className="hero-copy" data-reveal>
             <div className="availability"><span /> Bêta privée</div>
             <h1>Vos données produit, prêtes à être vues.</h1>
             <p>
               Fichr transforme vos fichiers en fiches fiables, prêtes pour vos catalogues, vos exports et vos fichiers de diffusion.
             </p>
+            <p className="hero-promise">Importez une fois. Corrigez une fois. Réutilisez partout.</p>
             <div className="hero-actions">
-              <a className="button button--dark" href="#fonctionnement">Voir la démonstration <Arrow direction="down" /></a>
+              <a className="button button--dark" href="#transformation">Voir Fichr agir <Arrow direction="down" /></a>
               <a className="text-action" href="#tarifs">Découvrir les plans bêta <Arrow /></a>
             </div>
           </div>
 
-          <div className="product-window" aria-label="Aperçu statique du catalogue Fichr avec des données de démonstration">
+          <div className="product-window" data-reveal aria-label="Aperçu statique du catalogue Fichr avec des données de démonstration">
             <div className="window-header">
               <Image src={logoSrc} alt="" width={84} height={32} />
               <div className="window-nav"><span>Imports</span><b>Catalogue</b><span>Exports</span></div>
@@ -171,14 +113,14 @@ export default function Home() {
             <p className="demo-label">Interface et données présentées à titre illustratif.</p>
           </div>
 
-          <div className="format-flow" aria-label="Formats pris en charge">
+          <div className="format-flow" data-reveal aria-label="Formats pris en charge">
             <div><small>ENTRÉES</small>{sourceFormats.map((format) => <span key={format}>{format}</span>)}</div>
             <i><Arrow /></i>
             <div><small>SORTIES</small>{outputFormats.map((format) => <span key={format}>{format}</span>)}</div>
           </div>
         </section>
 
-        <section className="intro section-shell">
+        <section className="intro section-shell" data-reveal>
           <p className="section-kicker">Le problème</p>
           <div>
             <h2>Un produit change.<br />Cinq fichiers deviennent faux.</h2>
@@ -188,15 +130,30 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="transformation" id="transformation">
+          <div className="section-shell">
+            <div className="section-heading section-heading--split" data-reveal>
+              <div>
+                <p className="section-kicker">La transformation</p>
+                <h2>Cinq sources entrent.<br />Une fiche fiable ressort.</h2>
+              </div>
+              <p>Fichr rassemble, structure et contrôle ce qui était dispersé. Faites avancer la démonstration pour voir les erreurs devenir des décisions claires.</p>
+            </div>
+            <div data-reveal>
+              <TransformationDemo />
+            </div>
+          </div>
+        </section>
+
         <section className="workflow" id="fonctionnement">
           <div className="section-shell">
-            <div className="section-heading">
+            <div className="section-heading" data-reveal>
               <p className="section-kicker">Comment ça marche</p>
               <h2>Un flux simple.<br />Une donnée maîtrisée.</h2>
             </div>
             <div className="feature-grid">
               {features.map((feature) => (
-                <article key={feature.number}>
+                <article key={feature.number} data-reveal>
                   <span className="feature-number">{feature.number}</span>
                   <div className={`feature-visual feature-visual--${feature.number}`} aria-hidden="true">
                     {feature.number === "01" ? (
@@ -216,7 +173,7 @@ export default function Home() {
 
         <section className="product-proof" id="produit">
           <div className="section-shell product-proof-grid">
-            <div className="proof-copy">
+            <div className="proof-copy" data-reveal>
               <p className="section-kicker section-kicker--light">Le catalogue vivant</p>
               <h2>La bonne information.<br />Au bon endroit.</h2>
               <p>Chaque fiche réunit le contenu, les fichiers, le statut et l’historique dont vos équipes ont besoin. Une modification reste visible, contrôlable et réutilisable.</p>
@@ -228,7 +185,7 @@ export default function Home() {
               </ul>
             </div>
 
-            <div className="sheet-stack" aria-label="Exemple de fiche produit statique">
+            <div className="sheet-stack" data-reveal aria-label="Exemple de fiche produit statique">
               <div className="sheet-card sheet-card--back"><span>Historique</span><b>6 versions</b></div>
               <div className="sheet-card sheet-card--middle"><span>Fichiers</span><b>12 éléments</b></div>
               <article className="product-sheet">
@@ -250,8 +207,26 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="creative-control">
+          <div className="section-shell creative-control__grid">
+            <div className="creative-control__copy" data-reveal>
+              <p className="section-kicker">Votre direction artistique</p>
+              <h2>Votre identité reste devant.<br />Fichr travaille derrière.</h2>
+              <p>Vos produits, vos mots, vos images et votre mise en scène ne sont jamais uniformisés. Fichr fiabilise la matière ; vous gardez entièrement le regard.</p>
+              <ul>
+                <li>Une donnée source, plusieurs expressions</li>
+                <li>Des choix créatifs jamais écrasés</li>
+                <li>Moins de technique, plus de temps pour créer</li>
+              </ul>
+            </div>
+            <div data-reveal>
+              <ArtDirectionDemo />
+            </div>
+          </div>
+        </section>
+
         <section className="capabilities section-shell">
-          <div className="section-heading section-heading--split">
+          <div className="section-heading section-heading--split" data-reveal>
             <div><p className="section-kicker">Tout ce qui compte</p><h2>Solide dans les détails.</h2></div>
             <p>Fichr ne cache pas la donnée derrière une promesse magique. Il vous donne une méthode claire pour la préparer, la contrôler et la sortir proprement.</p>
           </div>
@@ -264,46 +239,52 @@ export default function Home() {
               ["Espaces", "Des collections distinctes pour séparer marques, activités ou catalogues."],
               ["Historique", "L’origine des imports, les validations et les sorties restent traçables."],
             ].map(([title, text], index) => (
-              <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{text}</p></article>
+              <article key={title} data-reveal><span>0{index + 1}</span><h3>{title}</h3><p>{text}</p></article>
             ))}
           </div>
         </section>
 
         <section className="assistance">
           <div className="section-shell assistance-grid">
-            <div>
+            <div data-reveal>
               <p className="section-kicker">Assistance contrôlée</p>
               <h2>Fichr propose.<br />Vous validez.</h2>
               <p>Les suggestions aident à classer, normaliser ou compléter. Elles restent visibles, explicables et réversibles. Rien ne remplace silencieusement vos données.</p>
             </div>
-            <div className="suggestion-card">
-              <header><span>Suggestion</span><small>Validation requise</small></header>
-              <div className="suggestion-body"><span className="spark">✦</span><div><small>CATÉGORIE PROPOSÉE</small><h3>Robinetterie industrielle</h3><p>Déduite de « vanne », « PN 40 » et « inox 316L ».</p></div></div>
-              <div className="suggestion-reasons"><span>3 indices utilisés</span><span>Validation humaine requise</span></div>
-              <footer aria-hidden="true"><span>Ignorer</span><span>Appliquer</span></footer>
+            <div data-reveal><SuggestionDemo /></div>
+          </div>
+        </section>
+
+        <section className="impact" id="impact">
+          <div className="section-shell">
+            <div className="impact-heading" data-reveal>
+              <p className="section-kicker section-kicker--light">Le travail que vous ne refaites plus</p>
+              <h2>Le même changement.<br />Une seule fois.</h2>
+              <p>Quand une référence, un prix ou une image évolue, l’équipe ne devrait pas recommencer le même travail dans chaque support. Mesurez votre propre scénario, sans promesse magique.</p>
             </div>
+            <div data-reveal><SavingsEstimator /></div>
           </div>
         </section>
 
         <section className="security section-shell" id="securite">
-          <div className="security-heading"><p className="section-kicker">Confiance</p><h2>Vos données restent les vôtres.</h2></div>
+          <div className="security-heading" data-reveal><p className="section-kicker">Confiance</p><h2>Vos données restent les vôtres.</h2></div>
           <div className="security-grid">
-            <article><span>01</span><h3>Production sur l’appareil</h3><p>Chaque utilisateur conserve ses données de production dans une base SQLite locale générée sur son appareil.</p></article>
-            <article><span>02</span><h3>Socle central séparé</h3><p>Les comptes et données client sensibles relèveront d’une infrastructure distincte, opérée par Fichr et non du site public.</p></article>
-            <article><span>03</span><h3>Actions traçables</h3><p>Imports, validations et exports gardent une origine lisible pour vos équipes.</p></article>
-            <article><span>04</span><h3>Contrôle explicite</h3><p>Les connexions externes et fonctions intelligentes restent désactivables et documentées.</p></article>
+            <article data-reveal><span>01</span><h3>Production sur l’appareil</h3><p>Chaque utilisateur conserve ses données de production dans une base SQLite locale générée sur son appareil.</p></article>
+            <article data-reveal><span>02</span><h3>Socle central séparé</h3><p>Les comptes et données client sensibles relèveront d’une infrastructure distincte, opérée par Fichr et non du site public.</p></article>
+            <article data-reveal><span>03</span><h3>Actions traçables</h3><p>Imports, validations et exports gardent une origine lisible pour vos équipes.</p></article>
+            <article data-reveal><span>04</span><h3>Contrôle explicite</h3><p>Les connexions externes et fonctions intelligentes restent désactivables et documentées.</p></article>
           </div>
         </section>
 
         <section className="pricing" id="tarifs">
           <div className="section-shell">
-            <div className="section-heading section-heading--split">
+            <div className="section-heading section-heading--split" data-reveal>
               <div><p className="section-kicker">Tarifs</p><h2>Commencez simplement.</h2></div>
               <p>Les prix sont confirmés pour cette phase. Les fonctions de connectivité restent en développement : chaque capacité est donc marquée selon son état réel.</p>
             </div>
             <div className="pricing-grid">
               {plans.map((plan) => (
-                <article className={plan.featured ? "plan plan--featured" : "plan"} key={plan.name}>
+                <article className={plan.featured ? "plan plan--featured" : "plan"} key={plan.name} data-reveal>
                   {plan.featured ? <span className="plan-badge">Cible de distribution</span> : null}
                   <div className="plan-title"><h3>{plan.name}</h3><AvailabilityBadge status={plan.availability} /></div><p>{plan.description}</p>
                   <div className="price"><strong>{plan.price} €</strong><span>/ mois à l’ouverture</span></div>
@@ -317,7 +298,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="faq section-shell">
+        <section className="faq section-shell" data-reveal>
           <div><p className="section-kicker">Questions</p><h2>Avant de vous lancer.</h2></div>
           <div className="faq-list">
             <details open><summary>Fichr remplace-t-il mon PIM ?<span>+</span></summary><p>Fichr peut servir de source produit pour les structures qui n’ont pas de PIM, ou de couche de préparation et de contrôle entre vos données existantes et vos supports.</p></details>
@@ -327,7 +308,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="final-cta" id="contact">
+        <section className="final-cta" id="contact" data-reveal>
           <Image src={logoSrc} alt="Fichr" width={132} height={50} />
           <div><p className="section-kicker">Bêta privée</p><h2>Vous gardez les choix.<br />Fichr prend en charge la méthode.</h2></div>
           <div className="final-contact"><p>Le canal de réception des demandes est en cours de validation. Aucun faux formulaire ne collecte vos coordonnées entre-temps.</p><span className="button button--dark button--disabled" aria-disabled="true">Demande bientôt disponible</span></div>
