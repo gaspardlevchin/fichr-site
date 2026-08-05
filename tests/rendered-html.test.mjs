@@ -27,6 +27,8 @@ test("server-renders the Fichr marketing homepage", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
 
   const html = await response.text();
   assert.match(html, /<html[^>]*lang="fr"/i);
@@ -72,9 +74,10 @@ test("keeps the public site separate from the Fichr application", async () => {
   assert.match(logo, /viewBox="360 340 820 310"/);
 
   await Promise.all([
-    access(new URL("../public/fonts/Montserrat-Regular.ttf", import.meta.url)),
-    access(new URL("../public/fonts/Montserrat-Medium.ttf", import.meta.url)),
-    access(new URL("../public/fonts/Montserrat-SemiBold.ttf", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-Regular.woff2", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-Medium.woff2", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-SemiBold.woff2", import.meta.url)),
+    access(new URL("../public/og/fichr-social.jpg", import.meta.url)),
   ]);
 
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
