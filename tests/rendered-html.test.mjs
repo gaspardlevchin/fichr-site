@@ -27,6 +27,8 @@ test("server-renders the Fichr marketing homepage", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
 
   const html = await response.text();
   assert.match(html, /<html[^>]*lang="fr"/i);
@@ -48,18 +50,19 @@ test("server-renders the Fichr marketing homepage", async () => {
 });
 
 test("keeps the public site separate from the Fichr application", async () => {
-  const [page, layout, packageJson, logo, productTruth] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+  const [page, layout, packageJson, logo, productTruth, betaForm] = await Promise.all([
+    readFile(new URL("../app/(root)/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/(root)/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../public/brand/fichr_logo.svg", import.meta.url), "utf8"),
     readFile(new URL("../content/product-truth.ts", import.meta.url), "utf8"),
+    readFile(new URL("../components/beta-request-form.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(packageJson, /"name": "fichr-site"/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(layout, /lang="fr"/);
-  assert.match(page, /Aucun faux formulaire ne collecte vos coordonnées/);
+  assert.match(page, /aucune coordonnée n’est encore collectée/);
   assert.doesNotMatch(page, /from\s+["'][^"']*(?:server|db)\/|drizzle|better-sqlite3|checkout/i);
   assert.match(productTruth, /direct_channel_connections|Connexions directes aux plateformes|Connexions directes standards/);
   assert.match(productTruth, /status: "planned"/);
@@ -69,28 +72,59 @@ test("keeps the public site separate from the Fichr application", async () => {
   assert.match(productTruth, /businessPrice = 129/);
   assert.match(productTruth, /SQLite locale/);
   assert.match(page, /site marketing n’héberge ni catalogue ni données de production/);
+  assert.match(betaForm, /NEXT_PUBLIC_BETA_RECEIVER_URL/);
+  assert.match(betaForm, /disabled=\{!enabled/);
+  assert.doesNotMatch(betaForm, /localStorage|sessionStorage/);
   assert.match(logo, /viewBox="360 340 820 310"/);
 
   await Promise.all([
-    access(new URL("../public/fonts/Montserrat-Regular.ttf", import.meta.url)),
-    access(new URL("../public/fonts/Montserrat-Medium.ttf", import.meta.url)),
-    access(new URL("../public/fonts/Montserrat-SemiBold.ttf", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-Regular.woff2", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-Medium.woff2", import.meta.url)),
+    access(new URL("../public/fonts/Montserrat-SemiBold.woff2", import.meta.url)),
   ]);
 
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
+});
+
+test("renders localized public pages without exposing the local application", async () => {
+  const [french, english, legal, missing] = await Promise.all([
+    render("/fr/securite"),
+    render("/en/produit"),
+    render("/fr/mentions-legales"),
+    render("/en/product"),
+  ]);
+
+  assert.equal(french.status, 200);
+  const frenchHtml = await french.text();
+  assert.match(frenchHtml, /<html[^>]*lang="fr-FR"/i);
+  assert.match(frenchHtml, /SQLite local/);
+  assert.match(frenchHtml, /site public n’y accède pas/);
+
+  assert.equal(english.status, 200);
+  const englishHtml = await english.text();
+  assert.match(englishHtml, /<html[^>]*lang="en-GB"/i);
+  assert.match(englishHtml, /A local product source/);
+
+  assert.equal(missing.status, 404);
+
+  assert.equal(legal.status, 200);
+  const legalHtml = await legal.text();
+  assert.match(legalHtml, /name="robots" content="noindex, nofollow"/);
+  assert.match(legalHtml, /Structure juridique à renseigner/);
 });
 
 test("publishes crawl metadata and a dedicated not-found page", async () => {
   const [robots, sitemap, notFound] = await Promise.all([
     render("/robots.txt"),
     render("/sitemap.xml"),
-    render("/route-that-does-not-exist"),
+    readFile(new URL("../app/not-found.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.equal(robots.status, 200);
   assert.match(await robots.text(), /Sitemap:\s+https:\/\/gaspardlevchin\.github\.io\/fichr-site\/sitemap\.xml/);
   assert.equal(sitemap.status, 200);
-  assert.match(await sitemap.text(), /https:\/\/gaspardlevchin\.github\.io\/fichr-site\//);
-  assert.equal(notFound.status, 404);
-  assert.match(await notFound.text(), /Cette fiche est introuvable\./);
+  const sitemapText = await sitemap.text();
+  assert.match(sitemapText, /https:\/\/gaspardlevchin\.github\.io\/fichr-site\/fr\/produit\//);
+  assert.doesNotMatch(sitemapText, /mentions-legales|confidentialite|\/cgv\//);
+  assert.match(notFound, /Cette fiche est introuvable\./);
 });

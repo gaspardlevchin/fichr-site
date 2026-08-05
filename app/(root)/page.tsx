@@ -7,7 +7,8 @@ import {
   businessPrice,
   plans,
   type Availability,
-} from "../content/product-truth";
+} from "../../content/product-truth";
+import { localeNames, locales } from "../../content/locales";
 
 const sourceFormats = ["CSV", "XLSX", "JSON"];
 const outputFormats = ["TXT", "CSV", "XLSX", "JSON", "PDF"];
@@ -45,7 +46,9 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/brand/fichr_logo.svg`;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const logoSrc = `${basePath}/brand/fichr_logo.svg`;
+  const pageHref = (slug: string) => `${basePath}/fr/${slug}`;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -82,15 +85,16 @@ export default function Home() {
         </a>
 
         <nav className="desktop-nav" aria-label="Navigation principale">
-          <a href="#fonctionnement">Démonstration</a>
-          <a href="#produit">Produit</a>
-          <a href="#securite">Sécurité</a>
-          <a href="#tarifs">Tarifs</a>
+          <a href={pageHref("demo")}>Démonstration</a>
+          <a href={pageHref("produit")}>Produit</a>
+          <a href={pageHref("securite")}>Sécurité</a>
+          <a href={pageHref("tarifs")}>Tarifs</a>
         </nav>
 
         <div className="header-actions">
-          <a className="text-action" href="#fonctionnement">Voir la démo</a>
-          <a className="button button--dark button--compact" href="#contact">Accès bêta</a>
+          <a className="text-action" href={pageHref("demo")}>Voir la démo</a>
+          <a className="button button--dark button--compact" href={pageHref("acces-beta")}>Accès bêta</a>
+          <details className="language-picker"><summary aria-label="Langue">FR</summary><div>{locales.map((locale) => <a href={`${basePath}/${locale}/`} hrefLang={locale} lang={locale} key={locale}>{localeNames[locale]}</a>)}</div></details>
         </div>
 
         <button
@@ -106,11 +110,12 @@ export default function Home() {
         </button>
 
         <nav id="mobile-nav" className={menuOpen ? "mobile-nav mobile-nav--open" : "mobile-nav"} aria-label="Navigation mobile">
-          <a href="#fonctionnement" onClick={() => setMenuOpen(false)}>Démonstration</a>
-          <a href="#produit" onClick={() => setMenuOpen(false)}>Produit</a>
-          <a href="#securite" onClick={() => setMenuOpen(false)}>Sécurité</a>
-          <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
-          <a className="button button--dark" href="#contact" onClick={() => setMenuOpen(false)}>Accès bêta</a>
+          <a href={pageHref("demo")} onClick={() => setMenuOpen(false)}>Démonstration</a>
+          <a href={pageHref("produit")} onClick={() => setMenuOpen(false)}>Produit</a>
+          <a href={pageHref("securite")} onClick={() => setMenuOpen(false)}>Sécurité</a>
+          <a href={pageHref("tarifs")} onClick={() => setMenuOpen(false)}>Tarifs</a>
+          <a className="button button--dark" href={pageHref("acces-beta")} onClick={() => setMenuOpen(false)}>Accès bêta</a>
+          <div className="mobile-languages" aria-label="Langue">{locales.map((locale) => <a className={locale === "fr" ? "is-current" : ""} href={`${basePath}/${locale}/`} key={locale}>{locale.toUpperCase()}</a>)}</div>
         </nav>
       </header>
 
@@ -123,8 +128,8 @@ export default function Home() {
               Fichr transforme vos fichiers en fiches fiables, prêtes pour vos catalogues, vos exports et vos fichiers de diffusion.
             </p>
             <div className="hero-actions">
-              <a className="button button--dark" href="#fonctionnement">Voir la démonstration <Arrow direction="down" /></a>
-              <a className="text-action" href="#tarifs">Découvrir les plans bêta <Arrow /></a>
+              <a className="button button--dark" href={pageHref("demo")}>Voir la démonstration <Arrow /></a>
+              <a className="text-action" href={pageHref("tarifs")}>Découvrir les plans bêta <Arrow /></a>
             </div>
           </div>
 
@@ -295,6 +300,18 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="product-worlds section-shell" aria-labelledby="product-worlds-title">
+          <div className="section-heading section-heading--split">
+            <div><p className="section-kicker">Même méthode, différents métiers</p><h2 id="product-worlds-title">La donnée avant le décor.</h2></div>
+            <p>Pièce industrielle, matière artisanale ou collection expressive : Fichr structure les informations sans imposer une esthétique aux produits.</p>
+          </div>
+          <div className="product-worlds-grid">
+            <figure><Image src={`${basePath}/images/industrial-valve.webp`} alt="Vanne industrielle en acier photographiée sur fond neutre" width={1200} height={900} unoptimized /><figcaption>Industrie · références et caractéristiques</figcaption></figure>
+            <figure><Image src={`${basePath}/images/craft-materials.webp`} alt="Échantillons de céramique et de lin sur une table claire" width={1200} height={900} unoptimized /><figcaption>Artisanat · matières et variantes</figcaption></figure>
+            <figure><Image src={`${basePath}/images/expressive-materials.webp`} alt="Composition de panneaux acoustiques jaunes et noirs avec quincaillerie" width={1200} height={900} unoptimized /><figcaption>Collection · images et cohérence</figcaption></figure>
+          </div>
+        </section>
+
         <section className="pricing" id="tarifs">
           <div className="section-shell">
             <div className="section-heading section-heading--split">
@@ -330,7 +347,7 @@ export default function Home() {
         <section className="final-cta" id="contact">
           <Image src={logoSrc} alt="Fichr" width={132} height={50} />
           <div><p className="section-kicker">Bêta privée</p><h2>Vous gardez les choix.<br />Fichr prend en charge la méthode.</h2></div>
-          <div className="final-contact"><p>Le canal de réception des demandes est en cours de validation. Aucun faux formulaire ne collecte vos coordonnées entre-temps.</p><span className="button button--dark button--disabled" aria-disabled="true">Demande bientôt disponible</span></div>
+          <div className="final-contact"><p>Le canal de réception des demandes est en cours de validation. La page d’accès est prête, mais aucune coordonnée n’est encore collectée.</p><a className="button button--dark" href={pageHref("acces-beta")}>Préparer mon accès</a></div>
         </section>
       </main>
 
@@ -338,9 +355,9 @@ export default function Home() {
         <div className="footer-main">
           <Image src={logoSrc} alt="Fichr" width={112} height={42} />
           <p>Structurez. Validez. Publiez.</p>
-          <nav aria-label="Pied de page"><a href="#fonctionnement">Démonstration</a><a href="#produit">Produit</a><a href="#securite">Sécurité</a><a href="#tarifs">Plans bêta</a></nav>
+          <nav aria-label="Pied de page"><a href={pageHref("demo")}>Démonstration</a><a href={pageHref("produit")}>Produit</a><a href={pageHref("securite")}>Sécurité</a><a href={pageHref("tarifs")}>Plans bêta</a></nav>
         </div>
-        <div className="footer-bottom"><span>© 2026 Fichr</span><span>Mentions légales et confidentialité à compléter avant publication.</span><a href="#top">Retour en haut ↑</a></div>
+        <div className="footer-bottom"><span>© 2026 Fichr</span><span>Documents juridiques en préparation.</span><a href={pageHref("mentions-legales")}>Mentions légales</a></div>
       </footer>
     </>
   );
