@@ -1,5 +1,16 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const montserrat = localFont({
+  src: [
+    { path: "../public/fonts/Montserrat-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../public/fonts/Montserrat-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../public/fonts/Montserrat-SemiBold.ttf", weight: "600", style: "normal" },
+  ],
+  variable: "--font-montserrat",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -51,7 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body className={montserrat.variable}>{children}</body>
     </html>
   );
 }

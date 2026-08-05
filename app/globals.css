@@ -1,29 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("/fonts/Montserrat-Regular.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Montserrat";
-  src: url("/fonts/Montserrat-Medium.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: "Montserrat";
-  src: url("/fonts/Montserrat-SemiBold.ttf") format("truetype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 600;
-}
-
 :root {
   --white: #fff;
   --page: #eeeeed;
@@ -61,7 +37,7 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  font-family: "Montserrat", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-montserrat), "Avenir Next", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   line-height: 1.5;
   text-rendering: geometricPrecision;

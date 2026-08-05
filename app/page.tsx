@@ -58,6 +58,7 @@ function Arrow({ direction = "right" }: { direction?: "right" | "down" }) {
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/brand/fichr_logo.svg`;
 
   return (
     <>
@@ -65,7 +66,7 @@ export default function Home() {
 
       <header className="site-header">
         <a className="brand-link" href="#top" aria-label="Fichr — Accueil">
-          <Image src="/brand/fichr_logo.svg" alt="Fichr" width={130} height={50} priority />
+          <Image src={logoSrc} alt="Fichr" width={130} height={50} priority />
         </a>
 
         <nav className="desktop-nav" aria-label="Navigation principale">
@@ -116,7 +117,7 @@ export default function Home() {
 
           <div className="product-window" aria-label="Aperçu statique du catalogue Fichr avec des données de démonstration">
             <div className="window-header">
-              <Image src="/brand/fichr_logo.svg" alt="" width={84} height={32} />
+              <Image src={logoSrc} alt="" width={84} height={32} />
               <div className="window-nav"><span>Imports</span><b>Catalogue</b><span>Exports</span></div>
               <span className="window-avatar">FA</span>
             </div>
@@ -218,7 +219,7 @@ export default function Home() {
               <div className="sheet-card sheet-card--back"><span>Historique</span><b>6 versions</b></div>
               <div className="sheet-card sheet-card--middle"><span>Fichiers</span><b>12 éléments</b></div>
               <article className="product-sheet">
-                <header><Image src="/brand/fichr_logo.svg" alt="" width={66} height={24} /><span>FICHE PRODUIT / 00142</span></header>
+                <header><Image src={logoSrc} alt="" width={66} height={24} /><span>FICHE PRODUIT / 00142</span></header>
                 <div className="sheet-product">
                   <div className="large-valve" aria-hidden="true"><i /><i /><i /></div>
                   <div><span className="status status--ready">Fiche validée</span><h3>Vanne inox V42</h3><p>Commande manuelle · DN40 · Série industrie</p></div>
@@ -314,7 +315,7 @@ export default function Home() {
         </section>
 
         <section className="final-cta" id="contact">
-          <Image src="/brand/fichr_logo.svg" alt="Fichr" width={132} height={50} />
+          <Image src={logoSrc} alt="Fichr" width={132} height={50} />
           <div><p className="section-kicker">Bêta privée</p><h2>Préparez vos produits.<br />Fichr s’occupe du reste.</h2></div>
           <div className="final-contact"><p>La demande d’accès et l’agenda commercial seront reliés lors de la phase d’intégration.</p><span className="button button--dark button--disabled" aria-disabled="true">Accès bientôt disponible</span></div>
         </section>
@@ -322,7 +323,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-main">
-          <Image src="/brand/fichr_logo.svg" alt="Fichr" width={112} height={42} />
+          <Image src={logoSrc} alt="Fichr" width={112} height={42} />
           <p>Structurez. Validez. Publiez.</p>
           <nav aria-label="Pied de page"><a href="#fonctionnement">Fonctionnement</a><a href="#produit">Produit</a><a href="#securite">Sécurité</a><a href="#tarifs">Tarifs</a></nav>
         </div>
