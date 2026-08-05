@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "../globals.css";
+import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gaspardlevchin.github.io/fichr-site/";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const montserrat = localFont({
   src: [
-    { path: "../../public/fonts/Montserrat-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../../public/fonts/Montserrat-Medium.woff2", weight: "500", style: "normal" },
-    { path: "../../public/fonts/Montserrat-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "../public/fonts/Montserrat-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../public/fonts/Montserrat-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../public/fonts/Montserrat-SemiBold.ttf", weight: "600", style: "normal" },
   ],
   variable: "--font-montserrat",
   display: "swap",
@@ -36,15 +36,6 @@ export const metadata: Metadata = {
   publisher: "Fichr",
   alternates: {
     canonical: siteUrl,
-    languages: {
-      "x-default": siteUrl,
-      fr: new URL("fr/", siteUrl).toString(),
-      en: new URL("en/", siteUrl).toString(),
-      de: new URL("de/", siteUrl).toString(),
-      es: new URL("es/", siteUrl).toString(),
-      pt: new URL("pt/", siteUrl).toString(),
-      it: new URL("it/", siteUrl).toString(),
-    },
   },
   icons: {
     icon: `${basePath}/brand/fichr_logo.svg`,
@@ -62,14 +53,12 @@ export const metadata: Metadata = {
     description:
       "Structurez, validez et publiez vos informations produit depuis une source fiable.",
     url: siteUrl,
-    images: [{ url: `${basePath}/og/fichr-social.jpg`, width: 1200, height: 630, alt: "Composition de matières produit Fichr" }],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Fichr — Vos données produit, prêtes à être vues.",
     description:
       "Structurez, validez et publiez vos informations produit depuis une source fiable.",
-    images: [`${basePath}/og/fichr-social.jpg`],
   },
   robots: {
     index: true,
