@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", {
+    new Request(new URL(pathname, "http://localhost/"), {
       headers: { accept: "text/html" },
     }),
     {
@@ -38,22 +38,30 @@ test("server-renders the Fichr marketing homepage", async () => {
   assert.match(html, /id="securite"/);
   assert.match(html, /id="tarifs"/);
   assert.match(html, /Interface et données présentées à titre illustratif\./);
+  assert.match(html, /Tarif en validation/);
+  assert.match(html, /Validation humaine requise/);
+  assert.doesNotMatch(html, />\s*(?:19|29|59|129)\s*€\s*</);
+  assert.ok(html.indexOf("<h3") > html.indexOf("<h2"), "the first H3 must follow the first H2");
   assert.doesNotMatch(html, /codex-preview|Starter Project|SkeletonPreview|react-loading-skeleton/i);
 });
 
 test("keeps the public site separate from the Fichr application", async () => {
-  const [page, layout, packageJson, logo] = await Promise.all([
+  const [page, layout, packageJson, logo, productTruth] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../public/brand/fichr_logo.svg", import.meta.url), "utf8"),
+    readFile(new URL("../content/product-truth.ts", import.meta.url), "utf8"),
   ]);
 
   assert.match(packageJson, /"name": "fichr-site"/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(layout, /lang="fr"/);
-  assert.match(page, /Canal de démonstration|Accès bientôt disponible|agenda commercial/);
+  assert.match(page, /Aucun faux formulaire ne collecte vos coordonnées/);
   assert.doesNotMatch(page, /from\s+["'][^"']*(?:server|db)\/|drizzle|better-sqlite3|checkout/i);
+  assert.match(productTruth, /direct_channel_connections|Connexions directes aux plateformes|Connexions directes standards/);
+  assert.match(productTruth, /status: "planned"/);
+  assert.doesNotMatch(page, /price:\s*"(?:19|29|59|129)"/);
   assert.match(logo, /viewBox="360 340 820 310"/);
 
   await Promise.all([
@@ -63,4 +71,19 @@ test("keeps the public site separate from the Fichr application", async () => {
   ]);
 
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
+});
+
+test("publishes crawl metadata and a dedicated not-found page", async () => {
+  const [robots, sitemap, notFound] = await Promise.all([
+    render("/robots.txt"),
+    render("/sitemap.xml"),
+    render("/route-that-does-not-exist"),
+  ]);
+
+  assert.equal(robots.status, 200);
+  assert.match(await robots.text(), /Sitemap:\s+https:\/\/gaspardlevchin\.github\.io\/fichr-site\/sitemap\.xml/);
+  assert.equal(sitemap.status, 200);
+  assert.match(await sitemap.text(), /https:\/\/gaspardlevchin\.github\.io\/fichr-site\//);
+  assert.equal(notFound.status, 404);
+  assert.match(await notFound.text(), /Cette fiche est introuvable\./);
 });

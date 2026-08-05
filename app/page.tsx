@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  availabilityLabels,
+  plans,
+  type Availability,
+} from "../content/product-truth";
 
 const sourceFormats = ["CSV", "XLSX", "JSON"];
 const outputFormats = ["TXT", "CSV", "XLSX", "JSON", "PDF"];
@@ -27,62 +32,69 @@ const features = [
   },
 ];
 
-const plans = [
-  {
-    name: "Starter",
-    price: "19",
-    description: "Pour structurer un premier catalogue et publier des fiches fiables.",
-    products: "100 produits",
-    features: ["Imports CSV", "Exports PDF, CSV et TXT", "Images et fichiers produit", "1 canal fichier"],
-  },
-  {
-    name: "Studio",
-    price: "29",
-    description: "Pour une équipe qui gère plusieurs collections et destinations.",
-    products: "500 produits",
-    features: ["Tout Starter", "Diagnostics avancés", "3 canaux actifs", "API en lecture"],
-    featured: true,
-  },
-  {
-    name: "Pro",
-    price: "59",
-    description: "Pour industrialiser les flux, les mappings et la distribution.",
-    products: "2 500 produits",
-    features: ["Tout Studio", "Suggestions assistées", "Mappings personnalisés", "API et synchronisations à activer"],
-  },
-];
-
 function Arrow({ direction = "right" }: { direction?: "right" | "down" }) {
   return <span aria-hidden="true">{direction === "right" ? "→" : "↓"}</span>;
 }
 
+function AvailabilityBadge({ status }: { status: Availability }) {
+  return <span className={`availability-badge availability-badge--${status}`}>{availabilityLabels[status]}</span>;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/brand/fichr_logo.svg`;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    const closeOutside = (event: PointerEvent) => {
+      if (headerRef.current?.contains(event.target as Node)) return;
+      setMenuOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOutside);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOutside);
+    };
+  }, [menuOpen]);
 
   return (
     <>
       <a className="skip-link" href="#content">Aller au contenu</a>
 
-      <header className="site-header">
+      <header className="site-header" ref={headerRef}>
         <a className="brand-link" href="#top" aria-label="Fichr — Accueil">
           <Image src={logoSrc} alt="Fichr" width={130} height={50} priority />
         </a>
 
         <nav className="desktop-nav" aria-label="Navigation principale">
-          <a href="#fonctionnement">Fonctionnement</a>
+          <a href="#fonctionnement">Démonstration</a>
           <a href="#produit">Produit</a>
           <a href="#securite">Sécurité</a>
           <a href="#tarifs">Tarifs</a>
         </nav>
 
         <div className="header-actions">
-          <a className="text-action" href="#tarifs">Voir les offres</a>
+          <a className="text-action" href="#fonctionnement">Voir la démo</a>
           <a className="button button--dark button--compact" href="#contact">Accès bêta</a>
         </div>
 
         <button
           className="menu-toggle"
+          ref={menuButtonRef}
           type="button"
           aria-controls="mobile-nav"
           aria-expanded={menuOpen}
@@ -93,7 +105,7 @@ export default function Home() {
         </button>
 
         <nav id="mobile-nav" className={menuOpen ? "mobile-nav mobile-nav--open" : "mobile-nav"} aria-label="Navigation mobile">
-          <a href="#fonctionnement" onClick={() => setMenuOpen(false)}>Fonctionnement</a>
+          <a href="#fonctionnement" onClick={() => setMenuOpen(false)}>Démonstration</a>
           <a href="#produit" onClick={() => setMenuOpen(false)}>Produit</a>
           <a href="#securite" onClick={() => setMenuOpen(false)}>Sécurité</a>
           <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
@@ -107,11 +119,11 @@ export default function Home() {
             <div className="availability"><span /> Bêta privée</div>
             <h1>Vos données produit, prêtes à être vues.</h1>
             <p>
-              Fichr transforme vos fichiers en fiches fiables, prêtes pour vos catalogues, vos exports et vos canaux de vente.
+              Fichr transforme vos fichiers en fiches fiables, prêtes pour vos catalogues, vos exports et vos fichiers de diffusion.
             </p>
             <div className="hero-actions">
-              <a className="button button--dark" href="#fonctionnement">Découvrir Fichr <Arrow direction="down" /></a>
-              <a className="text-action" href="#tarifs">Voir les tarifs <Arrow /></a>
+              <a className="button button--dark" href="#fonctionnement">Voir la démonstration <Arrow direction="down" /></a>
+              <a className="text-action" href="#tarifs">Découvrir les plans bêta <Arrow /></a>
             </div>
           </div>
 
@@ -142,15 +154,15 @@ export default function Home() {
               <div className="catalog-cards">
                 <article>
                   <div className="product-thumb product-thumb--valve"><i /><i /><i /></div>
-                  <div className="product-info"><span className="status status--ready">Prêt</span><h3>Vanne inox V42</h3><p>VIN-V42-040 · Industrie</p><div className="completion"><span><i style={{ width: "94%" }} /></span><b>94%</b></div></div>
+                  <div className="product-info"><span className="status status--ready">Prêt</span><strong className="product-name">Vanne inox V42</strong><p>VIN-V42-040 · Industrie</p><div className="completion"><span><i style={{ width: "94%" }} /></span><b>94%</b></div></div>
                 </article>
                 <article>
                   <div className="product-thumb product-thumb--panel"><i /><i /><i /></div>
-                  <div className="product-info"><span className="status status--warning">À compléter</span><h3>Panneau AP-6</h3><p>AP6-GR-120 · Acoustique</p><div className="completion"><span><i style={{ width: "68%" }} /></span><b>68%</b></div></div>
+                  <div className="product-info"><span className="status status--warning">À compléter</span><strong className="product-name">Panneau AP-6</strong><p>AP6-GR-120 · Acoustique</p><div className="completion"><span><i style={{ width: "68%" }} /></span><b>68%</b></div></div>
                 </article>
                 <article className="catalog-card--third">
                   <div className="product-thumb product-thumb--light"><i /><i /></div>
-                  <div className="product-info"><span className="status status--ready">Validé</span><h3>Module LED L8</h3><p>L8-3000K-B · Éclairage</p><div className="completion"><span><i style={{ width: "100%" }} /></span><b>100%</b></div></div>
+                  <div className="product-info"><span className="status status--ready">Validé</span><strong className="product-name">Module LED L8</strong><p>L8-3000K-B · Éclairage</p><div className="completion"><span><i style={{ width: "100%" }} /></span><b>100%</b></div></div>
                 </article>
               </div>
             </div>
@@ -266,7 +278,7 @@ export default function Home() {
             <div className="suggestion-card">
               <header><span>Suggestion</span><small>Validation requise</small></header>
               <div className="suggestion-body"><span className="spark">✦</span><div><small>CATÉGORIE PROPOSÉE</small><h3>Robinetterie industrielle</h3><p>Déduite de « vanne », « PN 40 » et « inox 316L ».</p></div></div>
-              <div className="suggestion-reasons"><span>3 indices utilisés</span><span>Aucune donnée envoyée sans accord</span></div>
+              <div className="suggestion-reasons"><span>3 indices utilisés</span><span>Validation humaine requise</span></div>
               <footer aria-hidden="true"><span>Ignorer</span><span>Appliquer</span></footer>
             </div>
           </div>
@@ -286,21 +298,21 @@ export default function Home() {
           <div className="section-shell">
             <div className="section-heading section-heading--split">
               <div><p className="section-kicker">Tarifs</p><h2>Commencez simplement.</h2></div>
-              <p>Facturation mensuelle, sans connexion de paiement sur ce site pour le moment. Les limites correspondent aux plans actuellement définis dans Fichr.</p>
+              <p>Les plans techniques existent, mais leurs tarifs commerciaux et les fonctions de connectivité restent en validation. Chaque capacité est donc marquée selon son état réel.</p>
             </div>
             <div className="pricing-grid">
               {plans.map((plan) => (
                 <article className={plan.featured ? "plan plan--featured" : "plan"} key={plan.name}>
-                  {plan.featured ? <span className="plan-badge">Le plus équilibré</span> : null}
-                  <h3>{plan.name}</h3><p>{plan.description}</p>
-                  <div className="price"><strong>{plan.price} €</strong><span>/ mois</span></div>
+                  {plan.featured ? <span className="plan-badge">Cible de distribution</span> : null}
+                  <div className="plan-title"><h3>{plan.name}</h3><AvailabilityBadge status={plan.availability} /></div><p>{plan.description}</p>
+                  <div className="price price--pending"><strong>Tarif en validation</strong><span>Aucun achat sur ce site</span></div>
                   <b className="product-limit">{plan.products}</b>
-                  <ul>{plan.features.map((item) => <li key={item}><span>✓</span>{item}</li>)}</ul>
-                  <a className={plan.featured ? "button button--dark" : "button button--light"} href="#contact">Choisir {plan.name}</a>
+                  <ul>{plan.features.map((item) => <li key={item.label}><AvailabilityBadge status={item.status} />{item.label}</li>)}</ul>
+                  <a className={plan.featured ? "button button--dark" : "button button--light"} href="#contact">Demander des nouvelles de {plan.name}</a>
                 </article>
               ))}
             </div>
-            <p className="business-note"><b>Business</b> — jusqu’à 10 000 produits, 50 canaux actifs et accompagnement de déploiement · 129 € / mois.</p>
+            <p className="business-note"><b>Business</b> — cadrage, quotas et accompagnement prévus sur mesure. Aucun tarif définitif ni connecteur direct n’est annoncé comme disponible.</p>
           </div>
         </section>
 
@@ -309,15 +321,15 @@ export default function Home() {
           <div className="faq-list">
             <details open><summary>Fichr remplace-t-il mon PIM ?<span>+</span></summary><p>Fichr peut servir de source produit pour les structures qui n’ont pas de PIM, ou de couche de préparation et de contrôle entre vos données existantes et vos supports.</p></details>
             <details><summary>Puis-je importer mes fichiers actuels ?<span>+</span></summary><p>Oui. Fichr prend actuellement en charge les imports CSV, XLSX et JSON avec mapping et revue des lignes avant intégration.</p></details>
-            <details><summary>Les connexions aux plateformes sont-elles actives ?<span>+</span></summary><p>Les flux fichier sont disponibles. Les synchronisations directes, OAuth et webhooks restent à activer selon les destinations et le plan.</p></details>
+            <details><summary>Les connexions aux plateformes sont-elles actives ?<span>+</span></summary><p>Non. Les exports de fichiers et les presets de préparation sont disponibles, dont l’import et l’export Shopify CSV. Les synchronisations live, OAuth, API Fichr, feeds hébergés et webhooks ne sont pas encore activés.</p></details>
             <details><summary>Où sont stockées mes données ?<span>+</span></summary><p>L’architecture actuelle est locale-first. Le mode d’hébergement et les engagements précis seront documentés avant toute ouverture publique.</p></details>
           </div>
         </section>
 
         <section className="final-cta" id="contact">
           <Image src={logoSrc} alt="Fichr" width={132} height={50} />
-          <div><p className="section-kicker">Bêta privée</p><h2>Préparez vos produits.<br />Fichr s’occupe du reste.</h2></div>
-          <div className="final-contact"><p>La demande d’accès et l’agenda commercial seront reliés lors de la phase d’intégration.</p><span className="button button--dark button--disabled" aria-disabled="true">Accès bientôt disponible</span></div>
+          <div><p className="section-kicker">Bêta privée</p><h2>Vous gardez les choix.<br />Fichr prend en charge la méthode.</h2></div>
+          <div className="final-contact"><p>Le canal de réception des demandes est en cours de validation. Aucun faux formulaire ne collecte vos coordonnées entre-temps.</p><span className="button button--dark button--disabled" aria-disabled="true">Demande bientôt disponible</span></div>
         </section>
       </main>
 
@@ -325,7 +337,7 @@ export default function Home() {
         <div className="footer-main">
           <Image src={logoSrc} alt="Fichr" width={112} height={42} />
           <p>Structurez. Validez. Publiez.</p>
-          <nav aria-label="Pied de page"><a href="#fonctionnement">Fonctionnement</a><a href="#produit">Produit</a><a href="#securite">Sécurité</a><a href="#tarifs">Tarifs</a></nav>
+          <nav aria-label="Pied de page"><a href="#fonctionnement">Démonstration</a><a href="#produit">Produit</a><a href="#securite">Sécurité</a><a href="#tarifs">Plans bêta</a></nav>
         </div>
         <div className="footer-bottom"><span>© 2026 Fichr</span><span>Mentions légales et confidentialité à compléter avant publication.</span><a href="#top">Retour en haut ↑</a></div>
       </footer>

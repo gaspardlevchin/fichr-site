@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gaspardlevchin.github.io/fichr-site/";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const montserrat = localFont({
   src: [
     { path: "../public/fonts/Montserrat-Regular.ttf", weight: "400", style: "normal" },
@@ -13,12 +16,13 @@ const montserrat = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Fichr — Vos données produit, prêtes à être vues",
     template: "%s — Fichr",
   },
   description:
-    "Fichr transforme vos fichiers en fiches produit fiables, prêtes pour vos catalogues, vos exports et vos canaux de vente.",
+    "Fichr transforme vos fichiers en fiches produit fiables, prêtes pour vos catalogues, vos exports et vos fichiers de diffusion.",
   applicationName: "Fichr",
   keywords: [
     "logiciel catalogue produit",
@@ -30,6 +34,12 @@ export const metadata: Metadata = {
   authors: [{ name: "Fichr" }],
   creator: "Fichr",
   publisher: "Fichr",
+  alternates: {
+    canonical: siteUrl,
+  },
+  icons: {
+    icon: `${basePath}/brand/fichr_logo.svg`,
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -42,6 +52,7 @@ export const metadata: Metadata = {
     title: "Fichr — Vos données produit, prêtes à être vues.",
     description:
       "Structurez, validez et publiez vos informations produit depuis une source fiable.",
+    url: siteUrl,
   },
   twitter: {
     card: "summary",
