@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   availabilityLabels,
+  businessPrice,
   plans,
   type Availability,
 } from "../content/product-truth";
@@ -287,8 +288,8 @@ export default function Home() {
         <section className="security section-shell" id="securite">
           <div className="security-heading"><p className="section-kicker">Confiance</p><h2>Vos données restent les vôtres.</h2></div>
           <div className="security-grid">
-            <article><span>01</span><h3>Local d’abord</h3><p>Fichr privilégie une architecture locale et des traitements maîtrisés quand c’est pertinent.</p></article>
-            <article><span>02</span><h3>Espaces isolés</h3><p>Les données, fichiers et droits sont séparés par espace de travail et vérifiés côté serveur.</p></article>
+            <article><span>01</span><h3>Production sur l’appareil</h3><p>Chaque utilisateur conserve ses données de production dans une base SQLite locale générée sur son appareil.</p></article>
+            <article><span>02</span><h3>Socle central séparé</h3><p>Les comptes et données client sensibles relèveront d’une infrastructure distincte, opérée par Fichr et non du site public.</p></article>
             <article><span>03</span><h3>Actions traçables</h3><p>Imports, validations et exports gardent une origine lisible pour vos équipes.</p></article>
             <article><span>04</span><h3>Contrôle explicite</h3><p>Les connexions externes et fonctions intelligentes restent désactivables et documentées.</p></article>
           </div>
@@ -298,21 +299,21 @@ export default function Home() {
           <div className="section-shell">
             <div className="section-heading section-heading--split">
               <div><p className="section-kicker">Tarifs</p><h2>Commencez simplement.</h2></div>
-              <p>Les plans techniques existent, mais leurs tarifs commerciaux et les fonctions de connectivité restent en validation. Chaque capacité est donc marquée selon son état réel.</p>
+              <p>Les prix sont confirmés pour cette phase. Les fonctions de connectivité restent en développement : chaque capacité est donc marquée selon son état réel.</p>
             </div>
             <div className="pricing-grid">
               {plans.map((plan) => (
                 <article className={plan.featured ? "plan plan--featured" : "plan"} key={plan.name}>
                   {plan.featured ? <span className="plan-badge">Cible de distribution</span> : null}
                   <div className="plan-title"><h3>{plan.name}</h3><AvailabilityBadge status={plan.availability} /></div><p>{plan.description}</p>
-                  <div className="price price--pending"><strong>Tarif en validation</strong><span>Aucun achat sur ce site</span></div>
+                  <div className="price"><strong>{plan.price} €</strong><span>/ mois à l’ouverture</span></div>
                   <b className="product-limit">{plan.products}</b>
                   <ul>{plan.features.map((item) => <li key={item.label}><AvailabilityBadge status={item.status} />{item.label}</li>)}</ul>
                   <a className={plan.featured ? "button button--dark" : "button button--light"} href="#contact">Demander des nouvelles de {plan.name}</a>
                 </article>
               ))}
             </div>
-            <p className="business-note"><b>Business</b> — cadrage, quotas et accompagnement prévus sur mesure. Aucun tarif définitif ni connecteur direct n’est annoncé comme disponible.</p>
+            <p className="business-note"><b>Business · {businessPrice} € / mois</b> — cadrage, quotas et accompagnement prévus sur mesure. Aucun connecteur direct n’est annoncé comme disponible.</p>
           </div>
         </section>
 
@@ -322,7 +323,7 @@ export default function Home() {
             <details open><summary>Fichr remplace-t-il mon PIM ?<span>+</span></summary><p>Fichr peut servir de source produit pour les structures qui n’ont pas de PIM, ou de couche de préparation et de contrôle entre vos données existantes et vos supports.</p></details>
             <details><summary>Puis-je importer mes fichiers actuels ?<span>+</span></summary><p>Oui. Fichr prend actuellement en charge les imports CSV, XLSX et JSON avec mapping et revue des lignes avant intégration.</p></details>
             <details><summary>Les connexions aux plateformes sont-elles actives ?<span>+</span></summary><p>Non. Les exports de fichiers et les presets de préparation sont disponibles, dont l’import et l’export Shopify CSV. Les synchronisations live, OAuth, API Fichr, feeds hébergés et webhooks ne sont pas encore activés.</p></details>
-            <details><summary>Où sont stockées mes données ?<span>+</span></summary><p>L’architecture actuelle est locale-first. Le mode d’hébergement et les engagements précis seront documentés avant toute ouverture publique.</p></details>
+            <details><summary>Où sont stockées mes données ?<span>+</span></summary><p>Les données de production restent dans un SQLite local sur votre appareil. Les comptes et données client sensibles seront séparés sur une infrastructure opérée par Fichr ; le site marketing n’héberge ni catalogue ni données de production.</p></details>
           </div>
         </section>
 

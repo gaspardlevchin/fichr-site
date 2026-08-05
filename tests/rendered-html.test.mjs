@@ -38,9 +38,11 @@ test("server-renders the Fichr marketing homepage", async () => {
   assert.match(html, /id="securite"/);
   assert.match(html, /id="tarifs"/);
   assert.match(html, /Interface et données présentées à titre illustratif\./);
-  assert.match(html, /Tarif en validation/);
+  assert.match(html, /19(?:<!-- -->)? €/);
+  assert.match(html, /29(?:<!-- -->)? €/);
+  assert.match(html, /59(?:<!-- -->)? €/);
+  assert.match(html, /129(?:<!-- -->)? € \/ mois/);
   assert.match(html, /Validation humaine requise/);
-  assert.doesNotMatch(html, />\s*(?:19|29|59|129)\s*€\s*</);
   assert.ok(html.indexOf("<h3") > html.indexOf("<h2"), "the first H3 must follow the first H2");
   assert.doesNotMatch(html, /codex-preview|Starter Project|SkeletonPreview|react-loading-skeleton/i);
 });
@@ -61,7 +63,12 @@ test("keeps the public site separate from the Fichr application", async () => {
   assert.doesNotMatch(page, /from\s+["'][^"']*(?:server|db)\/|drizzle|better-sqlite3|checkout/i);
   assert.match(productTruth, /direct_channel_connections|Connexions directes aux plateformes|Connexions directes standards/);
   assert.match(productTruth, /status: "planned"/);
-  assert.doesNotMatch(page, /price:\s*"(?:19|29|59|129)"/);
+  assert.match(productTruth, /price:\s*19/);
+  assert.match(productTruth, /price:\s*29/);
+  assert.match(productTruth, /price:\s*59/);
+  assert.match(productTruth, /businessPrice = 129/);
+  assert.match(productTruth, /SQLite locale/);
+  assert.match(page, /site marketing n’héberge ni catalogue ni données de production/);
   assert.match(logo, /viewBox="360 340 820 310"/);
 
   await Promise.all([

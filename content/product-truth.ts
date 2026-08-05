@@ -11,6 +11,7 @@ export type MarketingPlan = {
   featured?: boolean;
   features: AvailabilityItem[];
   name: "Starter" | "Studio" | "Pro";
+  price: 19 | 29 | 59;
   products: string;
 };
 
@@ -29,6 +30,7 @@ export const productTruth = {
     "Exports TXT, CSV, XLSX, JSON et PDF",
     "Import et export Shopify sous forme de fichiers",
     "Interface en français, anglais, allemand, espagnol, italien et portugais",
+    "Données de production conservées dans une base SQLite locale sur l’appareil de l’utilisateur",
     "Espaces de travail, rôles, sessions privées et isolation des données",
   ],
   beta: [
@@ -37,6 +39,7 @@ export const productTruth = {
     "Suggestions ciblées, explicables et toujours soumises à validation",
   ],
   planned: [
+    "Socle central pour les comptes et données client sensibles, opéré sur une infrastructure maîtrisée par Fichr",
     "Connexions directes aux plateformes",
     "Synchronisations planifiées",
     "API Fichr publique",
@@ -44,8 +47,8 @@ export const productTruth = {
     "Paiement et inscription entièrement autonomes",
   ],
   unconfirmed: [
-    "Tarifs commerciaux définitifs",
     "Domaine public de production",
+    "Adresse publique de l’application",
     "Fournisseur d’envoi des demandes bêta",
   ],
 } as const;
@@ -53,6 +56,7 @@ export const productTruth = {
 export const plans: MarketingPlan[] = [
   {
     name: "Starter",
+    price: 19,
     availability: "beta",
     description: "Le socle utile pour structurer et fiabiliser un premier catalogue.",
     products: "Jusqu’à 100 produits dans la configuration actuelle",
@@ -65,6 +69,7 @@ export const plans: MarketingPlan[] = [
   },
   {
     name: "Studio",
+    price: 29,
     availability: "planned",
     description: "Le niveau de distribution prévu pour plusieurs marques et destinations.",
     products: "Quotas et tarif commercial à valider",
@@ -78,6 +83,7 @@ export const plans: MarketingPlan[] = [
   },
   {
     name: "Pro",
+    price: 59,
     availability: "planned",
     description: "Le niveau d’intégration et d’automatisation prévu pour les flux complexes.",
     products: "Quotas et tarif commercial à valider",
@@ -97,3 +103,5 @@ export const truthSources = [
   "https://app.notion.com/p/38f40de75466819b910fee696c93a8e3",
   "https://app.notion.com/p/39a40de75466817ab4bedcc816daec28",
 ] as const;
+
+export const businessPrice = 129 as const;
