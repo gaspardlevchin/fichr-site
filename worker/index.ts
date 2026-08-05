@@ -27,9 +27,11 @@ function withSecurityHeaders(response: Response, request: Request): Response {
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
   headers.set("Cross-Origin-Opener-Policy", "same-origin");
+
   if (new URL(request.url).protocol === "https:") {
     headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -56,11 +58,11 @@ const worker = {
           return result.response();
         },
       }, allowedWidths);
+
       return withSecurityHeaders(response, request);
     }
 
-    const response = await handler.fetch(request, env, ctx);
-    return withSecurityHeaders(response, request);
+    return withSecurityHeaders(await handler.fetch(request, env, ctx), request);
   },
 };
 
